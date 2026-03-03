@@ -21,7 +21,7 @@ def github_login(request):
         "https://github.com/login/oauth/authorize"
         f"?client_id={settings.GITHUB_CLIENT_ID}"
         f"&state={state}"
-        "&scope=read:user user:email"
+        "&scope=read:user user:email repo"
     )
 
     return redirect(url)
@@ -82,7 +82,7 @@ def github_callback(request):
     refresh = RefreshToken.for_user(user)
 
     deep_link = (
-        f"http://localhost:54392/#/oauth-success"
+        f"http://127.0.0.1:3000/#/oauth-success"
         f"?access={refresh.access_token}&refresh={refresh}"
     )
 
