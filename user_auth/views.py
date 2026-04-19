@@ -10,6 +10,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from .models import GitHubProfile
+
 # Create your views here.
 
 
@@ -21,7 +23,7 @@ def github_login(request):
         "https://github.com/login/oauth/authorize"
         f"?client_id={settings.GITHUB_CLIENT_ID}"
         f"&state={state}"
-        "&scope=read:user user:email"
+        "&scope=read:user user:email repo"
     )
 
     return redirect(url)
@@ -46,8 +48,8 @@ def github_callback(request):
         },
         timeout=10,
     )
-
     token_json = token_res.json()
+
     access_token = token_json.get("access_token")
 
     if not access_token:
@@ -79,10 +81,14 @@ def github_callback(request):
         defaults={"email": primary_email},
     )
 
+    profile_obj, _ = GitHubProfile.objects.get_or_create(user=user)
+    profile_obj.github_token = access_token
+    profile_obj.save()
+
     refresh = RefreshToken.for_user(user)
 
     deep_link = (
-        f"http://localhost:54392/#/oauth-success"
+        f"http://127.0.0.1:3000/oauth-success"
         f"?access={refresh.access_token}&refresh={refresh}"
     )
 
