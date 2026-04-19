@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "user_auth",
     "github_repo",
+    "repo_analysis",
 ]
 
 MIDDLEWARE = [
